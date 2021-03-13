@@ -144,3 +144,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
 }
+
+REST_JWT_REGISTRATION = {
+    'CREATE_USER_SERIALIZER': 'core.serializers.CreateUserSerializer'
+}
