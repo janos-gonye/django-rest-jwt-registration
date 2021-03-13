@@ -10,12 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import os
-from dotenv import load_doatenv
+from dotenv import load_dotenv
 from pathlib import Path
 
 
 dotenv_path = os.path.realpath('./.env')
-load_doatenv(dotenv_path)
+load_dotenv(dotenv_path)
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
