@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'rest_framework',
 
     'core',
+    'django_rest_jwt_registration',
 ]
 
 MIDDLEWARE = [
