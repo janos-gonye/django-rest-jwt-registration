@@ -3,7 +3,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from rest_framework.serializers import ModelSerializer
 
-from django_rest_jwt_registration.helpers import import_elm_from_str
+from django_rest_jwt_registration.utils import import_elm_from_str
 
 
 class DjangoRestJwtRegistrationConfig(AppConfig):
