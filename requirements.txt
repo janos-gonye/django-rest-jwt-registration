@@ -3,3 +3,4 @@ django-dotenv
 djangorestframework
 psycopg2-binary
 python-dotenv
+pyjwt
