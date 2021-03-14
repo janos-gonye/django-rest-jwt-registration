@@ -1,19 +1,17 @@
-import smtplib
-
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core import mail
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from django_rest_jwt_registration.utils import import_elm_from_str
-from django_rest_jwt_registration.token import encode_token, TokenTypes
-from django_rest_jwt_registration.exceptions import InternalServerError
+from django_rest_jwt_registration.utils import import_elm_from_str, send_mail
+from django_rest_jwt_registration import token as token_utils
+from django_rest_jwt_registration.exceptions import BadRequestError, InternalServerError
 
 
+User = get_user_model()
 CreateUserSerializer = import_elm_from_str(settings.REST_JWT_REGISTRATION['CREATE_USER_SERIALIZER'])
 REGISTRATION_TOKEN_LIFETIME = settings.REST_JWT_REGISTRATION['REGISTRATION_TOKEN_LIFETIME']
 REGISTRATION_TOKEN_DELETE_LIFETIME = settings.REST_JWT_REGISTRATION['REGISTRATION_DELETE_TOKEN_LIFETIME']
@@ -26,18 +24,15 @@ class RegistrationAPIView(APIView):
         serializer = CreateUserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = dict(serializer.validated_data)
-        token = encode_token(data, TokenTypes.REGISTRATION_TOKEN, lifetime=REGISTRATION_TOKEN_LIFETIME)
+        token = token_utils.encode_token(data, token_utils.REGISTRATION_TOKEN, lifetime=REGISTRATION_TOKEN_LIFETIME)
         confirm_url = self.build_confirm_url(token)
-        try:
-            mail.send_mail(
-                subject=_('Confirm registration'),
-                message=confirm_url,
-                from_email=settings.EMAIL_HOST_USER,
-                recipient_list=[data['email']],
-            )
-            return Response({'detail': _('Confirmation email sent')})
-        except smtplib.SMTPException as err:
-            raise InternalServerError(_('Error when sending confirmation email')) from err
+        send_mail(
+            subject=_('Confirm registration'),
+            message=confirm_url,
+            recipient_list=[data['email']],
+            err_msg=_('Sending confirmation email failed'),
+        )
+        return Response({'detail': _('Confirmation email sent')})
 
     def build_confirm_url(self, token):
         current_app = self.request.resolver_match.app_name
@@ -51,14 +46,30 @@ class RegistrationConfirmAPIView(APIView):
     permission_classes = ()
 
     def get(self, request):
-        return Response({'hello': 'world!'})
+        token = request.GET.get('token')
+        if not token:
+            raise BadRequestError(_('Token missing'))
+        payload = token_utils.decode_token(token, token_utils.REGISTRATION_TOKEN)
+        serializer = CreateUserSerializer(data=payload)
+        # If another user registered meanwhile, the username might already exist.
+        # TODO: Store the username and email pair candidates on the server-side, and validate them.
+        serializer.is_valid(raise_exception=True)
+        data = dict(serializer.validated_data)
+        user = User.objects.create(**data)
+        send_mail(
+            subject=_('Registration activated'),
+            message='Registration activated',
+            recipient_list=[user.email],
+            err_msg=_('Sending email failed'),
+        )
+        return Response({'detail': _('Succesfully registered')})
 
 
 class RegistrationDeleteAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def get_object(self):
-        return get_user_model().objects.get(pk=self.request.user.id)
+        return User.objects.get(pk=self.request.user.id)
 
     def post(self, request):
         return Response({'hello': 'world!'})
