@@ -64,7 +64,7 @@ class RegistrationConfirmAPIView(APIView):
             recipient_list=[user.email],
             err_msg=_('Sending email failed'),
         )
-        return Response({'detail': _('Succesfully registered')})
+        return Response({'detail': _('Successfully registered')})
 
 
 class RegistrationDeleteAPIView(APIView):
@@ -80,7 +80,7 @@ class RegistrationDeleteAPIView(APIView):
             'user_id': user.id}, token_utils.REGISTRATION_DELETE_TOKEN, lifetime=REGISTRATION_DELETE_TOKEN_LIFETIME)
         confirm_url = self.build_confirm_url(token)
         send_mail(
-            subject=_('Delete registration'),
+            subject=_('Delete account'),
             message=confirm_url,
             recipient_list=[user.email],
             err_msg=_('Sending confirmation email failed'),
@@ -99,4 +99,16 @@ class RegistrationConfirmDeleteAPIView(APIView):
     permission_classes = ()
 
     def get(self, request):
-        return Response({'hello': 'world!'})
+        token = request.GET.get('token')
+        if not token:
+            raise BadRequestError(_('Token missing'))
+        payload = token_utils.decode_token(token, token_utils.REGISTRATION_DELETE_TOKEN)
+        user = User.objects.get(pk=payload['user_id'])
+        user.delete()
+        send_mail(
+            subject=_('Account deleted'),
+            message=_('Account deleted'),
+            recipient_list=[user.email],
+            err_msg=_('Sending email failed'),
+        )
+        return Response({'detail': _('Successfully deleted')})
