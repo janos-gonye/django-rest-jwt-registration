@@ -8,13 +8,13 @@ from rest_framework.views import APIView
 
 from django_rest_jwt_registration.utils import import_elm_from_str, send_mail
 from django_rest_jwt_registration import token as token_utils
-from django_rest_jwt_registration.exceptions import BadRequestError, InternalServerError
+from django_rest_jwt_registration.exceptions import BadRequestError
 
 
 User = get_user_model()
 CreateUserSerializer = import_elm_from_str(settings.REST_JWT_REGISTRATION['CREATE_USER_SERIALIZER'])
 REGISTRATION_TOKEN_LIFETIME = settings.REST_JWT_REGISTRATION['REGISTRATION_TOKEN_LIFETIME']
-REGISTRATION_TOKEN_DELETE_LIFETIME = settings.REST_JWT_REGISTRATION['REGISTRATION_DELETE_TOKEN_LIFETIME']
+REGISTRATION_DELETE_TOKEN_LIFETIME = settings.REST_JWT_REGISTRATION['REGISTRATION_DELETE_TOKEN_LIFETIME']
 
 
 class RegistrationAPIView(APIView):
@@ -56,6 +56,8 @@ class RegistrationConfirmAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         data = dict(serializer.validated_data)
         user = User.objects.create(**data)
+        user.set_password(data['password'])
+        user.save()
         send_mail(
             subject=_('Registration activated'),
             message='Registration activated',
@@ -71,8 +73,26 @@ class RegistrationDeleteAPIView(APIView):
     def get_object(self):
         return User.objects.get(pk=self.request.user.id)
 
-    def post(self, request):
-        return Response({'hello': 'world!'})
+    def get(self, request):
+        user = self.get_object()
+        print(user)
+        token = token_utils.encode_token({
+            'user_id': user.id}, token_utils.REGISTRATION_DELETE_TOKEN, lifetime=REGISTRATION_DELETE_TOKEN_LIFETIME)
+        confirm_url = self.build_confirm_url(token)
+        send_mail(
+            subject=_('Delete registration'),
+            message=confirm_url,
+            recipient_list=[user.email],
+            err_msg=_('Sending confirmation email failed'),
+        )
+        return Response({'detail': _('Confirmation email sent')})
+
+    def build_confirm_url(self, token):
+        current_app = self.request.resolver_match.app_name
+        registration_delete_path = reverse('registration_delete', current_app=current_app)
+        registration_delete_confirm_path = reverse('registration_delete_confirm', current_app=current_app)
+        uri = self.request.build_absolute_uri()
+        return uri.replace(registration_delete_path, registration_delete_confirm_path) + f'?token={token}'
 
 
 class RegistrationConfirmDeleteAPIView(APIView):
