@@ -17,7 +17,7 @@ def encode_token(payload, token_type, lifetime, from_=None):
     payload['__expires_at__'] = from_ + lifetime
     # Add some randomness to the token
     payload['__randomness__'] = str(uuid.uuid4())
-    payload[token_type] = True
+    payload[str(token_type)] = True
     return jwt.encode(payload, settings.SECRET_KEY)
 
 
@@ -28,7 +28,7 @@ def decode_token(token, token_type):
         payload = jwt.decode(token, settings.SECRET_KEY)
     except jwt.PyJWTError as err:
         raise ValueError() from err
-    if payload.get(token_type) is not True:
+    if payload.get(str(token_type)) is not True:
         return ValueError()
     if time.time() > payload['__expires_at__']:
         raise ValueError()

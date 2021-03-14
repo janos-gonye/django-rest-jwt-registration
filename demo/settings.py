@@ -146,5 +146,7 @@ REST_FRAMEWORK = {
 }
 
 REST_JWT_REGISTRATION = {
-    'CREATE_USER_SERIALIZER': 'core.serializers.CreateUserSerializer'
+    'CREATE_USER_SERIALIZER': 'core.serializers.CreateUserSerializer',
+    'REGISTRATION_TOKEN_LIFETIME': int(os.getenv('REGISTRATION_TOKEN_LIFETIME', '3600')),
+    'REGISTRATION_DELETE_TOKEN_LIFETIME': int(os.getenv('REGISTRATION_DELETE_TOKEN_LIFETIME', '3600')),
 }
