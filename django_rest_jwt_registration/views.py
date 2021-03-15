@@ -15,6 +15,7 @@ User = get_user_model()
 CreateUserSerializer = import_elm_from_str(settings.REST_JWT_REGISTRATION['CREATE_USER_SERIALIZER'])
 REGISTRATION_TOKEN_LIFETIME = settings.REST_JWT_REGISTRATION['REGISTRATION_TOKEN_LIFETIME']
 REGISTRATION_DELETE_TOKEN_LIFETIME = settings.REST_JWT_REGISTRATION['REGISTRATION_DELETE_TOKEN_LIFETIME']
+PASSWORD_CHANGE_TOKEN_LIFETIME = settings.REST_JWT_REGISTRATION['PASSWORD_CHANGE_TOKEN_LIFETIME']
 
 
 class RegistrationAPIView(APIView):
@@ -114,14 +115,37 @@ class RegistrationConfirmDeleteAPIView(APIView):
         return Response({'detail': _('Successfully deleted')})
 
 
-class PasswordChangeAPIView(APIView):
+class ResetPasswordAPIView(APIView):
     permission_classes = ()
 
-    def get(self, request):
-        return Response({'hello': 'wordl!'})
+    def post(self, request):
+        email = request.data.get('email')
+        if not email:
+            raise BadRequestError(_('Email missing'))
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({'detail': _('Confirmation email sent if a user with given email address exists')})
+        token = token_utils.encode_token({
+            'user_id': user.id}, token_utils.PASSWORD_CHANGE_TOKEN, PASSWORD_CHANGE_TOKEN_LIFETIME)
+        confirm_url = self.build_confirm_url(token)
+        send_mail(
+            subject=_('Change password'),
+            message=confirm_url,
+            recipient_list=[user.email],
+            err_msg=_('Sending confirmation email failed'),
+        )
+        return Response({'detail': _('Confirmation email sent if a user with given email address exists')})
+
+    def build_confirm_url(self, token):
+        current_app = self.request.resolver_match.app_name
+        reset_password_path = reverse('reset_password', current_app=current_app)
+        reset_password_confirm_path = reverse('reset_password_confirm', current_app=current_app)
+        uri = self.request.build_absolute_uri()
+        return uri.replace(reset_password_path, reset_password_confirm_path) + f'?token={token}'
 
 
-class PasswordChangeConfirmAPIView(APIView):
+class ResetPasswordConfirmAPIView(APIView):
     permission_classes = ()
 
     def get(self, request):
