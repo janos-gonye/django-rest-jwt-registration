@@ -21,6 +21,7 @@ class DjangoRestJwtRegistrationConfig(AppConfig):
         self._validate_create_user_serializer()
         self._validate_registration_token_lifetime()
         self._validate_registration_delete_token_lifetime()
+        self._validate_password_change_token_lifetime()
 
     def _validate_app_settings_object(self):
         try:
@@ -71,3 +72,6 @@ class DjangoRestJwtRegistrationConfig(AppConfig):
 
     def _validate_registration_delete_token_lifetime(self):
         self._validate_token_lifetime(name='REGISTRATION_DELETE_TOKEN_LIFETIME')
+
+    def _validate_password_change_token_lifetime(self):
+        self._validate_token_lifetime(name='PASSWORD_CHANGE_TOKEN_LIFETIME')
