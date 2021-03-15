@@ -130,7 +130,7 @@ class ResetPasswordAPIView(APIView):
             'user_id': user.id}, token_utils.PASSWORD_CHANGE_TOKEN, PASSWORD_CHANGE_TOKEN_LIFETIME)
         confirm_url = self.build_confirm_url(token)
         send_mail(
-            subject=_('Change password'),
+            subject=_('Reset password'),
             message=confirm_url,
             recipient_list=[user.email],
             err_msg=_('Sending confirmation email failed'),
@@ -149,4 +149,18 @@ class ResetPasswordConfirmAPIView(APIView):
     permission_classes = ()
 
     def get(self, request):
-        return Response({'hello': 'world!'})
+        token = request.GET.get('token')
+        if not token:
+            raise BadRequestError(_('Token missing'))
+        payload = token_utils.decode_token(token, token_utils.PASSWORD_CHANGE_TOKEN)
+        user = User.objects.get(pk=payload['user_id'])
+        new_password = User.objects.make_random_password()
+        user.set_password(new_password)
+        user.save()
+        send_mail(
+            subject=_('Reset password'),
+            message=new_password,
+            recipient_list=[user.email],
+            err_msg=_('Sending email failed'),
+        )
+        return Response({'detail': _('Password successfully reset')})
