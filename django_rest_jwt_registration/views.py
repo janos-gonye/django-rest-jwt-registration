@@ -112,3 +112,17 @@ class RegistrationConfirmDeleteAPIView(APIView):
             err_msg=_('Sending email failed'),
         )
         return Response({'detail': _('Successfully deleted')})
+
+
+class PasswordChangeAPIView(APIView):
+    permission_classes = ()
+
+    def get(self, request):
+        return Response({'hello': 'wordl!'})
+
+
+class PasswordChangeConfirmAPIView(APIView):
+    permission_classes = ()
+
+    def get(self, request):
+        return Response({'hello': 'world!'})
