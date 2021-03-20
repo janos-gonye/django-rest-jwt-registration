@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from django_rest_jwt_registration.utils import import_elm_from_str, send_mail
-from django_rest_jwt_registration import token as token_utils
+from django_rest_jwt_registration import serializers, token as token_utils
 from django_rest_jwt_registration.exceptions import BadRequestError
 
 
@@ -164,3 +164,25 @@ class ResetPasswordConfirmAPIView(APIView):
             err_msg=_('Sending email failed'),
         )
         return Response({'detail': _('Password successfully reset')})
+
+
+class ChangePasswordAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = serializers.ChangePasswordSerializer
+
+    def get_object(self):
+        return self.request.user
+
+    def _change_password(self, request):
+        user = self.get_object()
+        serializer = self.serializer_class(instance=user, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        # TODO: Update auth token
+        return Response({'detail': _('Password changed')})
+
+    def put(self, request):
+        return self._change_password(request)
+
+    def patch(self, request):
+        return self._change_password(request)

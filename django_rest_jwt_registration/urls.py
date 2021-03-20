@@ -9,4 +9,5 @@ urlpatterns = [
     path('registration/delete/confirm/', views.RegistrationConfirmDeleteAPIView.as_view(), name='registration_delete_confirm'),
     path('reset-password/', views.ResetPasswordAPIView.as_view(), name='reset_password'),
     path('reset-password/confirm/', views.ResetPasswordConfirmAPIView.as_view(), name='reset_password_confirm'),
+    path('change-password/', views.ChangePasswordAPIView.as_view(), name='change_password'),
 ]
