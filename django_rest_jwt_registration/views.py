@@ -1,7 +1,9 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.http import HttpResponse
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
+from django.views import View
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -43,7 +45,7 @@ class RegistrationAPIView(APIView):
         return uri.replace(registration_path, registration_confirm_path) + f'?token={token}'
 
 
-class RegistrationConfirmAPIView(APIView):
+class RegistrationConfirmView(View):
     permission_classes = ()
 
     def get(self, request):
@@ -65,7 +67,7 @@ class RegistrationConfirmAPIView(APIView):
             recipient_list=[user.email],
             err_msg=_('Sending email failed'),
         )
-        return Response({'detail': _('Successfully registered')})
+        return HttpResponse(_('Successfully registered'))
 
 
 class RegistrationDeleteAPIView(APIView):
@@ -96,7 +98,7 @@ class RegistrationDeleteAPIView(APIView):
         return uri.replace(registration_delete_path, registration_delete_confirm_path) + f'?token={token}'
 
 
-class RegistrationConfirmDeleteAPIView(APIView):
+class RegistrationConfirmDeleteView(View):
     permission_classes = ()
 
     def get(self, request):
@@ -112,7 +114,7 @@ class RegistrationConfirmDeleteAPIView(APIView):
             recipient_list=[user.email],
             err_msg=_('Sending email failed'),
         )
-        return Response({'detail': _('Successfully deleted')})
+        return HttpResponse(_('Successfully deleted'))
 
 
 class ResetPasswordAPIView(APIView):
@@ -145,7 +147,7 @@ class ResetPasswordAPIView(APIView):
         return uri.replace(reset_password_path, reset_password_confirm_path) + f'?token={token}'
 
 
-class ResetPasswordConfirmAPIView(APIView):
+class ResetPasswordConfirmView(View):
     permission_classes = ()
 
     def get(self, request):
@@ -163,7 +165,7 @@ class ResetPasswordConfirmAPIView(APIView):
             recipient_list=[user.email],
             err_msg=_('Sending email failed'),
         )
-        return Response({'detail': _('Password successfully reset')})
+        return HttpResponse(_('Password successfully reset'))
 
 
 class ChangePasswordAPIView(APIView):
