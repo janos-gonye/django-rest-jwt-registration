@@ -5,6 +5,13 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 
+class ResetPasswordSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = get_user_model()
+        fields = ('email', )
+
+
 class ChangePasswordSerializer(serializers.ModelSerializer):
     current_password = serializers.CharField(required=True, write_only=True)
     new_password = serializers.CharField(required=True, write_only=True)

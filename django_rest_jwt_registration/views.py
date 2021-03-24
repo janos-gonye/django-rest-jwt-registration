@@ -119,13 +119,13 @@ class RegistrationConfirmDeleteView(View):
 
 class ResetPasswordAPIView(APIView):
     permission_classes = ()
+    serializer_class = serializers.ResetPasswordSerializer
 
     def post(self, request):
-        email = request.data.get('email')
-        if not email:
-            raise BadRequestError(_('Email missing'))
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
         try:
-            user = User.objects.get(email=email)
+            user = User.objects.get(email=serializer.validated_data.get('email'))
         except User.DoesNotExist:
             return Response({'detail': _('Confirmation email sent if a user with given email address exists')})
         token = token_utils.encode_token({
