@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.http import HttpResponse
+from django.shortcuts import render
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.views import View
@@ -67,7 +67,7 @@ class RegistrationConfirmView(View):
             recipient_list=[user.email],
             err_msg=_('Sending email failed'),
         )
-        return HttpResponse(_('Successfully registered'))
+        return render(request, 'drjr_registration_confirm.html')
 
 
 class RegistrationDeleteAPIView(APIView):
@@ -114,7 +114,7 @@ class RegistrationConfirmDeleteView(View):
             recipient_list=[user.email],
             err_msg=_('Sending email failed'),
         )
-        return HttpResponse(_('Successfully deleted'))
+        return render(request, 'drjr_registration_delete_confirm.html')
 
 
 class ResetPasswordAPIView(APIView):
@@ -165,7 +165,7 @@ class ResetPasswordConfirmView(View):
             recipient_list=[user.email],
             err_msg=_('Sending email failed'),
         )
-        return HttpResponse(_('Password successfully reset'))
+        return render(request, 'drjr_reset_password_confirm.html')
 
 
 class ChangePasswordAPIView(APIView):
