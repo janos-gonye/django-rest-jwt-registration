@@ -67,7 +67,9 @@ class RegistrationConfirmView(View):
             recipient_list=[user.email],
             err_msg=_('Sending email failed'),
         )
-        return render(request, 'drjr_registration_confirm.html')
+        return render(request, 'drjr_registration_confirm.html', context={
+            'user': user,
+        })
 
 
 class RegistrationDeleteAPIView(APIView):
@@ -114,7 +116,9 @@ class RegistrationConfirmDeleteView(View):
             recipient_list=[user.email],
             err_msg=_('Sending email failed'),
         )
-        return render(request, 'drjr_registration_delete_confirm.html')
+        return render(request, 'drjr_registration_delete_confirm.html', context={
+            'user': user,
+        })
 
 
 class ResetPasswordAPIView(APIView):
@@ -165,7 +169,9 @@ class ResetPasswordConfirmView(View):
             recipient_list=[user.email],
             err_msg=_('Sending email failed'),
         )
-        return render(request, 'drjr_reset_password_confirm.html')
+        return render(request, 'drjr_reset_password_confirm.html', context={
+            'user': user,
+        })
 
 
 class ChangePasswordAPIView(APIView):
