@@ -76,7 +76,7 @@ class RegistrationDeleteAPIView(APIView):
     def get_object(self):
         return User.objects.get(pk=self.request.user.id)
 
-    def get(self, request):
+    def delete(self, request):
         user = self.get_object()
         print(user)
         token = token_utils.encode_token({
