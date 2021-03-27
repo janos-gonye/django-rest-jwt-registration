@@ -205,6 +205,15 @@ class ChangePasswordAPIView(APIView):
         serializer = self.serializer_class(instance=user, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        send_mail(
+            subject=_('Password changed'),
+            recipient_list=[user.email],
+            err_msg=_('Sending email failed'),
+            template_name='drjr_email_change_password.html',
+            context={
+                'user': user,
+            },
+        )
         # TODO: Update auth token
         return Response({'detail': _('Password changed')})
 
