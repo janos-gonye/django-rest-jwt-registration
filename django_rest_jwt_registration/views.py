@@ -28,12 +28,15 @@ class RegistrationAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         data = dict(serializer.validated_data)
         token = token_utils.encode_token(data, token_utils.REGISTRATION_TOKEN, lifetime=REGISTRATION_TOKEN_LIFETIME)
-        confirm_url = self.build_confirm_url(token)
         send_mail(
             subject=_('Confirm registration'),
-            message=confirm_url,
             recipient_list=[data['email']],
             err_msg=_('Sending confirmation email failed'),
+            template_name='drjr_email_registration.html',
+            context={
+                'user': User(**data),
+                'confirm_url': self.build_confirm_url(token),
+            },
         )
         return Response({'detail': _('Confirmation email sent')})
 
@@ -63,9 +66,12 @@ class RegistrationConfirmView(View):
         user.save()
         send_mail(
             subject=_('Registration activated'),
-            message='Registration activated',
             recipient_list=[user.email],
             err_msg=_('Sending email failed'),
+            template_name='drjr_email_registration_confirm.html',
+            context={
+                'user': user,
+            },
         )
         return render(request, 'drjr_registration_confirm.html', context={
             'user': user,
@@ -83,12 +89,15 @@ class RegistrationDeleteAPIView(APIView):
         print(user)
         token = token_utils.encode_token({
             'user_id': user.id}, token_utils.REGISTRATION_DELETE_TOKEN, lifetime=REGISTRATION_DELETE_TOKEN_LIFETIME)
-        confirm_url = self.build_confirm_url(token)
         send_mail(
             subject=_('Delete account'),
-            message=confirm_url,
             recipient_list=[user.email],
             err_msg=_('Sending confirmation email failed'),
+            template_name='drjr_email_registration_delete.html',
+            context={
+                'user': user,
+                'confirm_url': self.build_confirm_url(token),
+            },
         )
         return Response({'detail': _('Confirmation email sent')})
 
@@ -112,9 +121,12 @@ class RegistrationConfirmDeleteView(View):
         user.delete()
         send_mail(
             subject=_('Account deleted'),
-            message=_('Account deleted'),
             recipient_list=[user.email],
             err_msg=_('Sending email failed'),
+            template_name='drjr_email_registration_delete_confirm.html',
+            context={
+                'user': user,
+            },
         )
         return render(request, 'drjr_registration_delete_confirm.html', context={
             'user': user,
@@ -134,12 +146,15 @@ class ResetPasswordAPIView(APIView):
             return Response({'detail': _('Confirmation email sent if a user with given email address exists')})
         token = token_utils.encode_token({
             'user_id': user.id}, token_utils.PASSWORD_CHANGE_TOKEN, PASSWORD_CHANGE_TOKEN_LIFETIME)
-        confirm_url = self.build_confirm_url(token)
         send_mail(
             subject=_('Reset password'),
-            message=confirm_url,
             recipient_list=[user.email],
             err_msg=_('Sending confirmation email failed'),
+            template_name='drjr_email_reset_password.html',
+            context={
+                'user': user,
+                'confirm_url': self.build_confirm_url(token),
+            },
         )
         return Response({'detail': _('Confirmation email sent if a user with given email address exists')})
 
@@ -165,9 +180,13 @@ class ResetPasswordConfirmView(View):
         user.save()
         send_mail(
             subject=_('Reset password'),
-            message=new_password,
             recipient_list=[user.email],
             err_msg=_('Sending email failed'),
+            template_name='drjr_email_reset_password_confirm.html',
+            context={
+                'user': user,
+                'new_password': new_password,
+            },
         )
         return render(request, 'drjr_reset_password_confirm.html', context={
             'user': user,

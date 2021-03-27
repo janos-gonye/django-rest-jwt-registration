@@ -14,6 +14,8 @@ PASSWORD_CHANGE_TOKEN = 'password_change'
 
 
 def encode_token(payload, token_type, lifetime, from_=None):
+     # Don't lose reference
+    payload = dict(payload)
     if not from_:
         from_ = time.time()
     payload['__expires_at__'] = from_ + lifetime
