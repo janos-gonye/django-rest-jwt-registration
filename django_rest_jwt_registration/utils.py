@@ -1,5 +1,6 @@
 import importlib
 import smtplib
+import urllib.parse
 
 from django.conf import settings
 from django.core import mail
@@ -13,6 +14,10 @@ def import_elm_from_str(string):
     module = importlib.import_module(module)
     return getattr(module, elm)
 
+
+def get_full_template_name(name):
+    return urllib.parse.urljoin('drjr', name)
+  
 
 def send_mail(subject, message, recipient_list, err_msg):
     try:
