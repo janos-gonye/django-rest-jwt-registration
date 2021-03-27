@@ -59,7 +59,8 @@ class RegistrationConfirmView(View):
         serializer = CreateUserSerializer(data=payload)
         # If another user registered meanwhile, the username might already exist.
         # TODO: Store the username and email pair candidates on the server-side, and validate them.
-        serializer.is_valid(raise_exception=True)
+        if not serializer.is_valid():
+            return HttpResponseBadRequest(_('Token invalid'))
         data = dict(serializer.validated_data)
         user = User.objects.create(**data)
         user.set_password(data['password'])
