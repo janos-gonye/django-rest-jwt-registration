@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.http import HttpResponseBadRequest
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
@@ -10,7 +11,6 @@ from rest_framework.views import APIView
 
 from django_rest_jwt_registration.utils import import_elm_from_str, send_mail
 from django_rest_jwt_registration import serializers, token as token_utils
-from django_rest_jwt_registration.exceptions import BadRequestError
 
 
 User = get_user_model()
@@ -54,7 +54,7 @@ class RegistrationConfirmView(View):
     def get(self, request):
         token = request.GET.get('token')
         if not token:
-            raise BadRequestError(_('Token missing'))
+            return HttpResponseBadRequest(_('Token missing'))
         payload = token_utils.decode_token(token, token_utils.REGISTRATION_TOKEN)
         serializer = CreateUserSerializer(data=payload)
         # If another user registered meanwhile, the username might already exist.
@@ -115,7 +115,7 @@ class RegistrationConfirmDeleteView(View):
     def get(self, request):
         token = request.GET.get('token')
         if not token:
-            raise BadRequestError(_('Token missing'))
+            return HttpResponseBadRequest(_('Token missing'))
         payload = token_utils.decode_token(token, token_utils.REGISTRATION_DELETE_TOKEN)
         user = User.objects.get(pk=payload['user_id'])
         user.delete()
@@ -172,7 +172,7 @@ class ResetPasswordConfirmView(View):
     def get(self, request):
         token = request.GET.get('token')
         if not token:
-            raise BadRequestError(_('Token missing'))
+            return HttpResponseBadRequest(_('Token missing'))
         payload = token_utils.decode_token(token, token_utils.PASSWORD_CHANGE_TOKEN)
         user = User.objects.get(pk=payload['user_id'])
         new_password = User.objects.make_random_password()
