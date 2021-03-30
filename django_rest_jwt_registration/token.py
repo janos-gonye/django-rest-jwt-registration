@@ -1,28 +1,36 @@
-import time
-import uuid
+import datetime
 
 import jwt
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from django_rest_jwt_registration.exceptions import BadRequestError
+from django_rest_jwt_registration.models import Token
 
 
 REGISTRATION_TOKEN = 'registration'
 REGISTRATION_DELETE_TOKEN = 'registration_delete'
 PASSWORD_CHANGE_TOKEN = 'password_change'
+REGISTRATION_TOKEN_LIFETIME = settings.REST_JWT_REGISTRATION['REGISTRATION_TOKEN_LIFETIME']
+REGISTRATION_DELETE_TOKEN_LIFETIME = settings.REST_JWT_REGISTRATION['REGISTRATION_DELETE_TOKEN_LIFETIME']
+PASSWORD_CHANGE_TOKEN_LIFETIME = settings.REST_JWT_REGISTRATION['PASSWORD_CHANGE_TOKEN_LIFETIME']
 
 
-def encode_token(payload, token_type, lifetime, from_=None):
+def encode_token(payload, token_type):
      # Don't lose reference
     payload = dict(payload)
-    if not from_:
-        from_ = time.time()
-    payload['__expires_at__'] = from_ + lifetime
-    # Add some randomness to the token
-    payload['__randomness__'] = str(uuid.uuid4())
+    token_db_instance = Token.objects.create()
+    payload['__id__'] = str(token_db_instance.id)
     payload['__token_type__'] = token_type
     return jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+
+
+def _get_lifetime_by_tokentime(token_type):
+    return {
+        REGISTRATION_TOKEN: REGISTRATION_TOKEN_LIFETIME,
+        REGISTRATION_DELETE_TOKEN: REGISTRATION_DELETE_TOKEN_LIFETIME,
+        PASSWORD_CHANGE_TOKEN: PASSWORD_CHANGE_TOKEN_LIFETIME,
+    }[token_type]
 
 
 def decode_token(token, token_type):
@@ -32,10 +40,16 @@ def decode_token(token, token_type):
         raise BadRequestError(_('Token invalid')) from err
     if payload.get('__token_type__') != token_type:
         raise BadRequestError(_('Token invalid'))
-
-    if time.time() > payload['__expires_at__']:
+    try:
+        token = Token.objects.get(pk=payload['__id__'])
+        token.delete()
+    except Token.DoesNotExist as err:
+        raise BadRequestError(_('Token invalid')) from err
+    lifetime = _get_lifetime_by_tokentime(token_type)
+    now = datetime.datetime.now().astimezone(datetime.timezone.utc)
+    expired_at = token.created_at.astimezone(datetime.timezone.utc) + datetime.timedelta(seconds=lifetime)
+    if now > expired_at:
         raise BadRequestError(_('Token expired'))
-    del payload['__expires_at__']
-    del payload['__randomness__']
+    del payload['__id__']
     del payload['__token_type__']
     return payload

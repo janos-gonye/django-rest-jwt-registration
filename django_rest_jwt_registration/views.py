@@ -15,9 +15,6 @@ from django_rest_jwt_registration import serializers, token as token_utils
 
 User = get_user_model()
 CreateUserSerializer = import_elm_from_str(settings.REST_JWT_REGISTRATION['CREATE_USER_SERIALIZER'])
-REGISTRATION_TOKEN_LIFETIME = settings.REST_JWT_REGISTRATION['REGISTRATION_TOKEN_LIFETIME']
-REGISTRATION_DELETE_TOKEN_LIFETIME = settings.REST_JWT_REGISTRATION['REGISTRATION_DELETE_TOKEN_LIFETIME']
-PASSWORD_CHANGE_TOKEN_LIFETIME = settings.REST_JWT_REGISTRATION['PASSWORD_CHANGE_TOKEN_LIFETIME']
 
 
 class RegistrationAPIView(APIView):
@@ -27,7 +24,7 @@ class RegistrationAPIView(APIView):
         serializer = CreateUserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = dict(serializer.validated_data)
-        token = token_utils.encode_token(data, token_utils.REGISTRATION_TOKEN, lifetime=REGISTRATION_TOKEN_LIFETIME)
+        token = token_utils.encode_token(data, token_utils.REGISTRATION_TOKEN)
         send_mail(
             subject=_('Confirm registration'),
             recipient_list=[data['email']],
@@ -87,9 +84,7 @@ class RegistrationDeleteAPIView(APIView):
 
     def delete(self, request):
         user = self.get_object()
-        print(user)
-        token = token_utils.encode_token({
-            'user_id': user.id}, token_utils.REGISTRATION_DELETE_TOKEN, lifetime=REGISTRATION_DELETE_TOKEN_LIFETIME)
+        token = token_utils.encode_token({'user_id': user.id}, token_utils.REGISTRATION_DELETE_TOKEN)
         send_mail(
             subject=_('Delete account'),
             recipient_list=[user.email],
@@ -145,8 +140,7 @@ class ResetPasswordAPIView(APIView):
             user = User.objects.get(email=serializer.validated_data.get('email'))
         except User.DoesNotExist:
             return Response({'detail': _('Confirmation email sent if a user with given email address exists')})
-        token = token_utils.encode_token({
-            'user_id': user.id}, token_utils.PASSWORD_CHANGE_TOKEN, PASSWORD_CHANGE_TOKEN_LIFETIME)
+        token = token_utils.encode_token({'user_id': user.id}, token_utils.PASSWORD_CHANGE_TOKEN)
         send_mail(
             subject=_('Reset password'),
             recipient_list=[user.email],
