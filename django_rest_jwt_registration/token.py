@@ -25,7 +25,7 @@ def encode_token(payload, token_type):
     return jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
 
 
-def _get_lifetime_by_tokentime(token_type):
+def _get_lifetime_by_token_type(token_type):
     return {
         REGISTRATION_TOKEN: REGISTRATION_TOKEN_LIFETIME,
         REGISTRATION_DELETE_TOKEN: REGISTRATION_DELETE_TOKEN_LIFETIME,
@@ -45,7 +45,7 @@ def decode_token(token, token_type):
         token.delete()
     except Token.DoesNotExist as err:
         raise TokenDecodeError(_('Token invalid')) from err
-    lifetime = _get_lifetime_by_tokentime(token_type)
+    lifetime = _get_lifetime_by_token_type(token_type)
     now = datetime.datetime.now().astimezone(datetime.timezone.utc)
     expired_at = token.created_at.astimezone(datetime.timezone.utc) + datetime.timedelta(seconds=lifetime)
     if now > expired_at:
