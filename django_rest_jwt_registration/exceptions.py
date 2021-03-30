@@ -11,3 +11,7 @@ class BadRequestError(APIException):
 class InternalServerError(APIException):
     status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
     default_detail = _('Internal server error')
+
+
+class TokenDecodeError(Exception):
+    pass

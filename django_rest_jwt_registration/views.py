@@ -9,8 +9,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from django_rest_jwt_registration.utils import import_elm_from_str, send_mail
 from django_rest_jwt_registration import serializers, token as token_utils
+from django_rest_jwt_registration.decorators import handle_token_decode_error
+from django_rest_jwt_registration.utils import import_elm_from_str, send_mail
 
 
 User = get_user_model()
@@ -48,6 +49,7 @@ class RegistrationAPIView(APIView):
 class RegistrationConfirmView(View):
     permission_classes = ()
 
+    @handle_token_decode_error
     def get(self, request):
         token = request.GET.get('token')
         if not token:
@@ -108,6 +110,7 @@ class RegistrationDeleteAPIView(APIView):
 class RegistrationConfirmDeleteView(View):
     permission_classes = ()
 
+    @handle_token_decode_error
     def get(self, request):
         token = request.GET.get('token')
         if not token:
@@ -164,6 +167,7 @@ class ResetPasswordAPIView(APIView):
 class ResetPasswordConfirmView(View):
     permission_classes = ()
 
+    @handle_token_decode_error
     def get(self, request):
         token = request.GET.get('token')
         if not token:

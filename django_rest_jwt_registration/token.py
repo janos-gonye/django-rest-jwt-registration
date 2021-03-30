@@ -4,7 +4,7 @@ import jwt
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
-from django_rest_jwt_registration.exceptions import BadRequestError
+from django_rest_jwt_registration.exceptions import TokenDecodeError
 from django_rest_jwt_registration.models import Token
 
 
@@ -37,19 +37,19 @@ def decode_token(token, token_type):
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
     except jwt.PyJWTError as err:
-        raise BadRequestError(_('Token invalid')) from err
+        raise TokenDecodeError(_('Token invalid')) from err
     if payload.get('__token_type__') != token_type:
-        raise BadRequestError(_('Token invalid'))
+        raise TokenDecodeError(_('Token invalid'))
     try:
         token = Token.objects.get(pk=payload['__id__'])
         token.delete()
     except Token.DoesNotExist as err:
-        raise BadRequestError(_('Token invalid')) from err
+        raise TokenDecodeError(_('Token invalid')) from err
     lifetime = _get_lifetime_by_tokentime(token_type)
     now = datetime.datetime.now().astimezone(datetime.timezone.utc)
     expired_at = token.created_at.astimezone(datetime.timezone.utc) + datetime.timedelta(seconds=lifetime)
     if now > expired_at:
-        raise BadRequestError(_('Token expired'))
+        raise TokenDecodeError(_('Token expired'))
     del payload['__id__']
     del payload['__token_type__']
     return payload
