@@ -26,11 +26,15 @@ def encode_token(payload, token_type):
 
 
 def _get_lifetime_by_token_type(token_type):
-    return {
-        REGISTRATION_TOKEN: REGISTRATION_TOKEN_LIFETIME,
-        REGISTRATION_DELETE_TOKEN: REGISTRATION_DELETE_TOKEN_LIFETIME,
-        PASSWORD_CHANGE_TOKEN: PASSWORD_CHANGE_TOKEN_LIFETIME,
-    }[token_type]
+    try:
+        return {
+            REGISTRATION_TOKEN: REGISTRATION_TOKEN_LIFETIME,
+            REGISTRATION_DELETE_TOKEN: REGISTRATION_DELETE_TOKEN_LIFETIME,
+            PASSWORD_CHANGE_TOKEN: PASSWORD_CHANGE_TOKEN_LIFETIME,
+        }[token_type]
+    except KeyError as err:
+        raise NotImplementedError(
+            f"Token type '{token_type}' not registered in '_get_lifetime_by_token_type'") from err
 
 
 def decode_token(token, token_type):
