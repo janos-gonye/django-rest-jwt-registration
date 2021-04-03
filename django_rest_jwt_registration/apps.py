@@ -22,6 +22,7 @@ class DjangoRestJwtRegistrationConfig(AppConfig):
         self._validate_registration_token_lifetime()
         self._validate_registration_delete_token_lifetime()
         self._validate_password_change_token_lifetime()
+        self._validate_delete_expired_tokens_interval()
 
     def _validate_app_settings_object(self):
         try:
@@ -75,3 +76,16 @@ class DjangoRestJwtRegistrationConfig(AppConfig):
 
     def _validate_password_change_token_lifetime(self):
         self._validate_token_lifetime(name='PASSWORD_CHANGE_TOKEN_LIFETIME')
+
+    def _validate_delete_expired_tokens_interval(self):
+        try:
+            value = self.app_settings['DELETE_EXPIRED_TOKENS_INTERVAL']
+        except KeyError as err:
+            raise ImproperlyConfigured(
+                "'REST_JWT_REGISTRATION' is missing key 'DELETE_EXPIRED_TOKENS_INTERVAL'") from err
+        if not isinstance(value, int):
+            raise ImproperlyConfigured(
+                f"'REST_JWT_REGISTRATION.DELETE_EXPIRED_TOKENS_INTERVAL' is not of type {int}")
+
+        if value < 0:
+            raise ImproperlyConfigured("'DELETE_EXPIRED_TOKENS_INTERVAL' must be greater than 0")

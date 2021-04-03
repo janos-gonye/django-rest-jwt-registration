@@ -1,5 +1,6 @@
 import datetime
 
+from django.conf import settings
 from django.urls import path
 
 from django_rest_jwt_registration.models import Token
@@ -24,4 +25,4 @@ def delete_expired_tokens():
             token.delete()
 
 
-scheduler.interval(delete_expired_tokens, 60)
+scheduler.interval(delete_expired_tokens, settings.REST_JWT_REGISTRATION['DELETE_EXPIRED_TOKENS_INTERVAL'])
