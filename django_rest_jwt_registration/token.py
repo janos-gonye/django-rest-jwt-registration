@@ -28,5 +28,7 @@ def decode_token(token, token_type):
         raise TokenDecodeError(_('Token invalid')) from err
     if token.type != token_type:
         raise TokenDecodeError(_('Token invalid'))
+    if datetime.datetime.now().astimezone(datetime.timezone.utc) > token.expires_at:
+        raise TokenDecodeError(_('Token expired'))
     del payload['__id__']
     return payload
