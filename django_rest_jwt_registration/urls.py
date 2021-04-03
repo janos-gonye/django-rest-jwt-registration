@@ -1,5 +1,9 @@
+import datetime
+
 from django.urls import path
-from django_rest_jwt_registration import views
+
+from django_rest_jwt_registration.models import Token
+from django_rest_jwt_registration import scheduler, views
 
 
 urlpatterns = [
@@ -11,3 +15,13 @@ urlpatterns = [
     path('reset-password/confirm/', views.ResetPasswordConfirmView.as_view(), name='reset_password_confirm'),
     path('change-password/', views.ChangePasswordAPIView.as_view(), name='change_password'),
 ]
+
+
+def delete_expired_tokens():
+    now = datetime.datetime.now().astimezone(datetime.timezone.utc)
+    for token in Token.objects.all():
+        if now > token.expires_at:
+            token.delete()
+
+
+scheduler.interval(delete_expired_tokens, 60)
