@@ -214,7 +214,6 @@ class ChangePasswordAPIView(APIView):
                 'user': user,
             },
         )
-        # TODO: Update auth token
         return Response({'detail': _('Password changed')})
 
     def put(self, request):
