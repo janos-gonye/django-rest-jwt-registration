@@ -22,6 +22,8 @@ def delete_expired_tokens():
     now = datetime.datetime.now().astimezone(datetime.timezone.utc)
     for token in Token.objects.all():
         if now > token.expires_at:
+            if token.type == Token.REGISTRATION_TOKEN:
+                token.user.delete()
             token.delete()
 
 
