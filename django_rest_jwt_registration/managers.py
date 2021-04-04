@@ -9,6 +9,6 @@ class TokenManager(models.Manager):
         now = datetime.datetime.now().astimezone(datetime.timezone.utc)
         for token in self.all():
             if now > token.expires_at:
-                if token.type == token.REGISTRATION_TOKEN:
+                if token.type == token.REGISTRATION_TOKEN and token.user.is_active is False:
                     token.user.delete()
                 token.delete()
