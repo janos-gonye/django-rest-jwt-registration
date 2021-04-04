@@ -1,10 +1,11 @@
-import datetime
-
 from django.conf import settings
 from django.urls import path
 
 from django_rest_jwt_registration.models import Token
 from django_rest_jwt_registration import scheduler, views
+
+
+DELETE_EXPIRED_TOKENS_INTERVAL = settings.REST_JWT_REGISTRATION['DELETE_EXPIRED_TOKENS_INTERVAL']
 
 
 urlpatterns = [
@@ -18,13 +19,4 @@ urlpatterns = [
 ]
 
 
-def delete_expired_tokens():
-    now = datetime.datetime.now().astimezone(datetime.timezone.utc)
-    for token in Token.objects.all():
-        if now > token.expires_at:
-            if token.type == Token.REGISTRATION_TOKEN:
-                token.user.delete()
-            token.delete()
-
-
-scheduler.interval(delete_expired_tokens, settings.REST_JWT_REGISTRATION['DELETE_EXPIRED_TOKENS_INTERVAL'])
+scheduler.interval(Token.objects.delete_expired_tokens, DELETE_EXPIRED_TOKENS_INTERVAL)

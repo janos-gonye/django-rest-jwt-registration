@@ -6,6 +6,8 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from django_rest_jwt_registration.managers import TokenManager
+
 
 REGISTRATION_TOKEN_LIFETIME = settings.REST_JWT_REGISTRATION['REGISTRATION_TOKEN_LIFETIME']
 REGISTRATION_DELETE_TOKEN_LIFETIME = settings.REST_JWT_REGISTRATION['REGISTRATION_DELETE_TOKEN_LIFETIME']
@@ -14,6 +16,7 @@ User = get_user_model()
 
 
 class Token(models.Model):
+    objects = TokenManager()
     REGISTRATION_TOKEN = 'rt'
     REGISTRATION_DELETE_TOKEN = 'rd'
     PASSWORD_CHANGE_TOKEN = 'pc'
