@@ -1,5 +1,5 @@
-from django_rest_jwt_registration.models import AbstractEmailRequiredUser
+from django.contrib.auth.models import AbstractUser
 
 
-class User(AbstractEmailRequiredUser):
+class User(AbstractUser):
     pass
