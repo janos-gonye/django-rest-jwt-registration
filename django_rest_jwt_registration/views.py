@@ -26,14 +26,19 @@ class RegistrationAPIView(APIView):
         serializer = CreateUserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = dict(serializer.validated_data)
-        token = token_utils.encode_token(data, Token.REGISTRATION_TOKEN)
+        token, token_db_instance = token_utils.encode_token({}, Token.REGISTRATION_TOKEN)
+        user = User.objects.create(is_active=False, **data)
+        user.set_password(data['password'])
+        user.save()
+        token_db_instance.user = user
+        token_db_instance.save()
         send_mail(
             subject=_('Confirm registration'),
             recipient_list=[data['email']],
             err_msg=_('Sending confirmation email failed'),
             template_name='drjr_email_registration.html',
             context={
-                'user': User(**data),
+                'user': user,
                 'confirm_url': self.build_confirm_url(token),
             },
         )
@@ -55,15 +60,9 @@ class RegistrationConfirmView(View):
         token = request.GET.get('token')
         if not token:
             return HttpResponseBadRequest(_('Token missing'))
-        payload = token_utils.decode_token(token, Token.REGISTRATION_TOKEN)
-        serializer = CreateUserSerializer(data=payload)
-        # If another user registered meanwhile, the username might already exist.
-        # TODO: Store the username and email pair candidates on the server-side, and validate them.
-        if not serializer.is_valid():
-            return HttpResponseBadRequest(_('Token invalid'))
-        data = dict(serializer.validated_data)
-        user = User.objects.create(**data)
-        user.set_password(data['password'])
+        __, token_db_instance = token_utils.decode_token(token, Token.REGISTRATION_TOKEN)
+        user = token_db_instance.user
+        user.is_active = True
         user.save()
         send_mail(
             subject=_('Registration activated'),
@@ -87,7 +86,7 @@ class RegistrationDeleteAPIView(APIView):
 
     def delete(self, request):
         user = self.get_object()
-        token = token_utils.encode_token({'user_id': user.id}, Token.REGISTRATION_DELETE_TOKEN)
+        token, __ = token_utils.encode_token({'user_id': user.id}, Token.REGISTRATION_DELETE_TOKEN)
         send_mail(
             subject=_('Delete account'),
             recipient_list=[user.email],
@@ -116,7 +115,7 @@ class RegistrationConfirmDeleteView(View):
         token = request.GET.get('token')
         if not token:
             return HttpResponseBadRequest(_('Token missing'))
-        payload = token_utils.decode_token(token, Token.REGISTRATION_DELETE_TOKEN)
+        payload, __ = token_utils.decode_token(token, Token.REGISTRATION_DELETE_TOKEN)
         user = User.objects.get(pk=payload['user_id'])
         user.delete()
         send_mail(
@@ -144,7 +143,7 @@ class ResetPasswordAPIView(APIView):
             user = User.objects.get(email=serializer.validated_data.get('email'))
         except User.DoesNotExist:
             return Response({'detail': _('Confirmation email sent if a user with given email address exists')})
-        token = token_utils.encode_token({'user_id': user.id}, Token.PASSWORD_CHANGE_TOKEN)
+        token, __ = token_utils.encode_token({'user_id': user.id}, Token.PASSWORD_CHANGE_TOKEN)
         send_mail(
             subject=_('Reset password'),
             recipient_list=[user.email],
@@ -173,7 +172,7 @@ class ResetPasswordConfirmView(View):
         token = request.GET.get('token')
         if not token:
             return HttpResponseBadRequest(_('Token missing'))
-        payload = token_utils.decode_token(token, Token.PASSWORD_CHANGE_TOKEN)
+        payload, __ = token_utils.decode_token(token, Token.PASSWORD_CHANGE_TOKEN)
         user = User.objects.get(pk=payload['user_id'])
         new_password = User.objects.make_random_password()
         user.set_password(new_password)
