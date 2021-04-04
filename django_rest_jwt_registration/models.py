@@ -2,6 +2,7 @@ import datetime
 import uuid
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -9,6 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 REGISTRATION_TOKEN_LIFETIME = settings.REST_JWT_REGISTRATION['REGISTRATION_TOKEN_LIFETIME']
 REGISTRATION_DELETE_TOKEN_LIFETIME = settings.REST_JWT_REGISTRATION['REGISTRATION_DELETE_TOKEN_LIFETIME']
 PASSWORD_CHANGE_TOKEN_LIFETIME = settings.REST_JWT_REGISTRATION['PASSWORD_CHANGE_TOKEN_LIFETIME']
+User = get_user_model()
 
 
 class Token(models.Model):
@@ -23,6 +25,7 @@ class Token(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     type = models.CharField(choices=TOKEN_TYPES, max_length=3, default=REGISTRATION_TOKEN)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, default=None)
 
     @property
     def lifetime(self):
