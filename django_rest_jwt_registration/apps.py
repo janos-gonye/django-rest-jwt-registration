@@ -37,7 +37,8 @@ class DjangoRestJwtRegistrationConfig(AppConfig):
         try:
             user_serializer = self.app_settings['CREATE_USER_SERIALIZER']
         except KeyError as err:
-            raise ImproperlyConfigured("'REST_JWT_REGISTRATION' is missing key 'CREATE_USER_SERIALIZER'") from err
+            # Use default in 'views.py'
+            return
         if not isinstance(user_serializer, str):
             raise ImproperlyConfigured(f"'CREATE_USER_SERIALIZER' is expected to be of type {str}")
 

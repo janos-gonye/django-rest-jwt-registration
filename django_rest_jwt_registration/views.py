@@ -16,7 +16,11 @@ from django_rest_jwt_registration.utils import import_elm_from_str, send_mail
 
 
 User = get_user_model()
-CreateUserSerializer = import_elm_from_str(settings.REST_JWT_REGISTRATION['CREATE_USER_SERIALIZER'])
+try:
+    CREATE_USER_SERIALIZER_PATH = settings.REST_JWT_REGISTRATION['CREATE_USER_SERIALIZER']
+except KeyError:
+    CREATE_USER_SERIALIZER_PATH = 'django_rest_jwt_registration.serializers.CreateUserSerializer'
+CreateUserSerializer = import_elm_from_str(CREATE_USER_SERIALIZER_PATH)
 
 
 class RegistrationAPIView(APIView):
