@@ -5,10 +5,21 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 
+User = get_user_model()
+
+
+class CreateUserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'email', 'password')
+        read_only_fields = ('id', 'last_login', 'date_joined')
+
+
 class ResetPasswordSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = get_user_model()
+        model = User
         fields = ('email', )
 
 
