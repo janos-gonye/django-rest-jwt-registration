@@ -9,7 +9,7 @@ from django_rest_jwt_registration.models import Token
 
 
 def encode_token(payload, token_type):
-     # Don't lose reference
+    # Lose reference
     payload = dict(payload)
     token_db_instance = Token.objects.create(type=token_type)
     payload['__id__'] = str(token_db_instance.id)
