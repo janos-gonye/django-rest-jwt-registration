@@ -224,3 +224,73 @@ class ChangePasswordAPIView(APIView):
 
     def patch(self, request):
         return self._change_password(request)
+
+
+class ChangeEmailAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = serializers.ChangeEmailSerializer
+
+    def get_object(self):
+        return self.request.user
+
+    def _change_email(self, request):
+        user = self.get_object()
+        serializer = self.serializer_class(instance=user, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data.get('email')
+        token, __ = token_utils.encode_token({
+            'user_id': user.id,
+            'email': email,
+        }, Token.EMAIL_CHANGE_TOKEN)
+        send_mail(
+            subject=_('Change email'),
+            recipient_list=[email],
+            err_msg=_('Sending confirmation email failed'),
+            template_name='drjr_email_change_email.html',
+            context={
+                'user': user,
+                'confirm_url': self.build_confirm_url(token),
+            },
+        )
+        return Response({'detail': _('Confirmation email sent if given email exists')})
+
+    def build_confirm_url(self, token):
+        current_app = self.request.resolver_match.app_name
+        change_email_path = reverse('change_email', current_app=current_app)
+        change_email_confirm_path = reverse('change_email_confirm', current_app=current_app)
+        uri = self.request.build_absolute_uri()
+        return uri.replace(change_email_path, change_email_confirm_path) + f'?token={token}'
+
+    def put(self, request):
+        return self._change_email(request)
+
+    def patch(self, request):
+        return self._change_email(request)
+
+
+class ChangeEmailConfirmView(View):
+    permission_classes = ()
+
+    @handle_token_decode_error
+    def get(self, request):
+        token = request.GET.get('token')
+        if not token:
+            return HttpResponseBadRequest(_('Token missing'))
+        payload, __ = token_utils.decode_token(token, Token.EMAIL_CHANGE_TOKEN)
+        user = User.objects.get(pk=payload['user_id'])
+        new_email = payload['email']
+        user.email = new_email
+        user.save()
+        send_mail(
+            subject=_('Email changed'),
+            recipient_list=[user.email],
+            err_msg=_('Sending email failed'),
+            template_name='drjr_email_change_email_confirm.html',
+            context={
+                'user': user,
+                'new_email': new_email,
+            },
+        )
+        return render(request, 'drjr_email_change_confirm.html', context={
+            'user': user,
+        })

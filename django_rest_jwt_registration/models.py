@@ -12,6 +12,7 @@ from django_rest_jwt_registration.managers import TokenManager
 REGISTRATION_TOKEN_LIFETIME = settings.REST_JWT_REGISTRATION['REGISTRATION_TOKEN_LIFETIME']
 REGISTRATION_DELETE_TOKEN_LIFETIME = settings.REST_JWT_REGISTRATION['REGISTRATION_DELETE_TOKEN_LIFETIME']
 PASSWORD_CHANGE_TOKEN_LIFETIME = settings.REST_JWT_REGISTRATION['PASSWORD_CHANGE_TOKEN_LIFETIME']
+EMAIL_CHANGE_TOKEN_LIFETIME = settings.REST_JWT_REGISTRATION['EMAIL_CHANGE_TOKEN_LIFETIME']
 User = get_user_model()
 
 
@@ -20,10 +21,12 @@ class Token(models.Model):
     REGISTRATION_TOKEN = 'rt'
     REGISTRATION_DELETE_TOKEN = 'rd'
     PASSWORD_CHANGE_TOKEN = 'pc'
+    EMAIL_CHANGE_TOKEN = 'ec'
     TOKEN_TYPES = (
         (REGISTRATION_TOKEN, _('Registration token')),
         (REGISTRATION_DELETE_TOKEN, _('Registration Delete Token')),
         (PASSWORD_CHANGE_TOKEN, _('Password Change Token')),
+        (EMAIL_CHANGE_TOKEN, _('Change Email Token')),
     )
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -36,6 +39,7 @@ class Token(models.Model):
             Token.REGISTRATION_TOKEN: REGISTRATION_TOKEN_LIFETIME,
             Token.REGISTRATION_DELETE_TOKEN: REGISTRATION_DELETE_TOKEN_LIFETIME,
             Token.PASSWORD_CHANGE_TOKEN: PASSWORD_CHANGE_TOKEN_LIFETIME,
+            Token.EMAIL_CHANGE_TOKEN: EMAIL_CHANGE_TOKEN_LIFETIME,
         }[self.type]
 
     @property

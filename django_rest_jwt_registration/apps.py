@@ -22,6 +22,7 @@ class DjangoRestJwtRegistrationConfig(AppConfig):
         self._validate_registration_token_lifetime()
         self._validate_registration_delete_token_lifetime()
         self._validate_password_change_token_lifetime()
+        self._validate_email_change_token_lifetime()
         self._validate_delete_expired_tokens_interval()
 
     def _validate_app_settings_object(self):
@@ -77,6 +78,9 @@ class DjangoRestJwtRegistrationConfig(AppConfig):
 
     def _validate_password_change_token_lifetime(self):
         self._validate_token_lifetime(name='PASSWORD_CHANGE_TOKEN_LIFETIME')
+
+    def _validate_email_change_token_lifetime(self):
+        self._validate_token_lifetime(name='EMAIL_CHANGE_TOKEN_LIFETIME')
 
     def _validate_delete_expired_tokens_interval(self):
         try:

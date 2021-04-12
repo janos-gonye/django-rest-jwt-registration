@@ -16,6 +16,8 @@ urlpatterns = [
     path('reset-password/', views.ResetPasswordAPIView.as_view(), name='reset_password'),
     path('reset-password/confirm/', views.ResetPasswordConfirmView.as_view(), name='reset_password_confirm'),
     path('change-password/', views.ChangePasswordAPIView.as_view(), name='change_password'),
+    path('change-email/', views.ChangeEmailAPIView.as_view(), name='change_email'),
+    path('change-email/confirm/', views.ChangeEmailConfirmView.as_view(), name='change_email_confirm'),
 ]
 
 
