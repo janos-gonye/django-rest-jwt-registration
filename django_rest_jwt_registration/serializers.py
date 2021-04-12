@@ -16,6 +16,14 @@ class CreateUserSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'last_login', 'date_joined')
 
 
+
+class ChangeEmailSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('email', )
+
+
 class ResetPasswordSerializer(serializers.ModelSerializer):
 
     class Meta:
