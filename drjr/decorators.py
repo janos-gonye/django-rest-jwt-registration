@@ -2,7 +2,7 @@ from functools import wraps
 
 from django.http import HttpResponseBadRequest
 
-from django_rest_jwt_registration.exceptions import TokenDecodeError
+from drjr.exceptions import TokenDecodeError
 
 
 def handle_token_decode_error(view_function):

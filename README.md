@@ -1,1 +1,1 @@
-# django-jwt-registration
+# django-rest-jwt-registration

@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from django_rest_jwt_registration.managers import TokenManager
+from drjr.managers import TokenManager
 
 
 REGISTRATION_TOKEN_LIFETIME = settings.REST_JWT_REGISTRATION['REGISTRATION_TOKEN_LIFETIME']

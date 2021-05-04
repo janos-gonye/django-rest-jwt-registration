@@ -6,7 +6,7 @@ from django.core import mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
-from django_rest_jwt_registration.exceptions import InternalServerError
+from drjr.exceptions import InternalServerError
 
 
 def import_elm_from_str(string):

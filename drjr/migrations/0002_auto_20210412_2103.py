@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('django_rest_jwt_registration', '0001_initial'),
+        ('drjr', '0001_initial'),
     ]
 
     operations = [

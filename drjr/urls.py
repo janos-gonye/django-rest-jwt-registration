@@ -1,8 +1,8 @@
 from django.conf import settings
 from django.urls import path
 
-from django_rest_jwt_registration.models import Token
-from django_rest_jwt_registration import scheduler, views
+from drjr.models import Token
+from drjr import scheduler, views
 
 
 DELETE_EXPIRED_TOKENS_INTERVAL = settings.REST_JWT_REGISTRATION['DELETE_EXPIRED_TOKENS_INTERVAL']

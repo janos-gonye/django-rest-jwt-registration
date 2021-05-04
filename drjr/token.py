@@ -4,8 +4,8 @@ import jwt
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
-from django_rest_jwt_registration.exceptions import TokenDecodeError
-from django_rest_jwt_registration.models import Token
+from drjr.exceptions import TokenDecodeError
+from drjr.models import Token
 
 
 def encode_token(payload, token_type):

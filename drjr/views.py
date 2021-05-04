@@ -9,17 +9,17 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from django_rest_jwt_registration import serializers, token as token_utils
-from django_rest_jwt_registration.decorators import handle_token_decode_error
-from django_rest_jwt_registration.models import Token
-from django_rest_jwt_registration.utils import import_elm_from_str, send_mail
+from drjr import serializers, token as token_utils
+from drjr.decorators import handle_token_decode_error
+from drjr.models import Token
+from drjr.utils import import_elm_from_str, send_mail
 
 
 User = get_user_model()
 try:
     CREATE_USER_SERIALIZER_PATH = settings.REST_JWT_REGISTRATION['CREATE_USER_SERIALIZER']
 except KeyError:
-    CREATE_USER_SERIALIZER_PATH = 'django_rest_jwt_registration.serializers.CreateUserSerializer'
+    CREATE_USER_SERIALIZER_PATH = 'drjr.serializers.CreateUserSerializer'
 CreateUserSerializer = import_elm_from_str(CREATE_USER_SERIALIZER_PATH)
 
 
