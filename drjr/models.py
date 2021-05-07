@@ -1,18 +1,12 @@
 import datetime
 import uuid
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from drjr.managers import TokenManager
 
-
-REGISTRATION_TOKEN_LIFETIME = settings.DJANGO_REST_JWT_REGISTRATION['REGISTRATION_TOKEN_LIFETIME']
-REGISTRATION_DELETE_TOKEN_LIFETIME = settings.DJANGO_REST_JWT_REGISTRATION['REGISTRATION_DELETE_TOKEN_LIFETIME']
-PASSWORD_CHANGE_TOKEN_LIFETIME = settings.DJANGO_REST_JWT_REGISTRATION['PASSWORD_CHANGE_TOKEN_LIFETIME']
-EMAIL_CHANGE_TOKEN_LIFETIME = settings.DJANGO_REST_JWT_REGISTRATION['EMAIL_CHANGE_TOKEN_LIFETIME']
 User = get_user_model()
 
 
@@ -36,11 +30,12 @@ class Token(models.Model):
 
     @property
     def lifetime(self):
+        from drjr.apps import app_settings
         return {
-            Token.REGISTRATION_TOKEN: REGISTRATION_TOKEN_LIFETIME,
-            Token.REGISTRATION_DELETE_TOKEN: REGISTRATION_DELETE_TOKEN_LIFETIME,
-            Token.PASSWORD_CHANGE_TOKEN: PASSWORD_CHANGE_TOKEN_LIFETIME,
-            Token.EMAIL_CHANGE_TOKEN: EMAIL_CHANGE_TOKEN_LIFETIME,
+            Token.REGISTRATION_TOKEN: app_settings['REGISTRATION_TOKEN_LIFETIME'],
+            Token.REGISTRATION_DELETE_TOKEN: app_settings['REGISTRATION_DELETE_TOKEN_LIFETIME'],
+            Token.PASSWORD_CHANGE_TOKEN: app_settings['PASSWORD_CHANGE_TOKEN_LIFETIME'],
+            Token.EMAIL_CHANGE_TOKEN: app_settings['EMAIL_CHANGE_TOKEN_LIFETIME'],
         }[self.type]
 
     @property

@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.http import HttpResponseBadRequest
 from django.shortcuts import render
@@ -9,18 +8,15 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from drjr import serializers, token as token_utils
+from drjr import serializers
+from drjr import token as token_utils
+from drjr.apps import app_settings
 from drjr.decorators import handle_token_decode_error
 from drjr.models import Token
-from drjr.utils import import_elm_from_str, send_mail
-
+from drjr.utils import send_mail
 
 User = get_user_model()
-try:
-    CREATE_USER_SERIALIZER_PATH = settings.DJANGO_REST_JWT_REGISTRATION['CREATE_USER_SERIALIZER']
-except KeyError:
-    CREATE_USER_SERIALIZER_PATH = 'drjr.serializers.CreateUserSerializer'
-CreateUserSerializer = import_elm_from_str(CREATE_USER_SERIALIZER_PATH)
+CreateUserSerializer = app_settings['CREATE_USER_SERIALIZER']
 
 
 class RegistrationAPIView(APIView):

@@ -1,11 +1,10 @@
-from django.conf import settings
 from django.urls import path
 
-from drjr.models import Token
 from drjr import scheduler, views
+from drjr.apps import app_settings
+from drjr.models import Token
 
-
-DELETE_EXPIRED_TOKENS_INTERVAL = settings.DJANGO_REST_JWT_REGISTRATION['DELETE_EXPIRED_TOKENS_INTERVAL']
+DELETE_EXPIRED_TOKENS_INTERVAL = app_settings['DELETE_EXPIRED_TOKENS_INTERVAL']
 
 
 urlpatterns = [
