@@ -19,6 +19,10 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
 class ChangeEmailSerializer(serializers.ModelSerializer):
 
+    def validate_email(self, value):
+        if self.instance.email == value:
+            raise serializers.ValidationError(_('Current email provided.'))
+
     class Meta:
         model = User
         fields = ('email', )
