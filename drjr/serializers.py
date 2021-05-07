@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
-from django.db.models.fields import EmailField
 from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
@@ -28,11 +27,8 @@ class ChangeEmailSerializer(serializers.Serializer):
         return value
 
 
-class ResetPasswordSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = User
-        fields = ('email', )
+class ResetPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()
 
 
 class ChangePasswordSerializer(serializers.ModelSerializer):
