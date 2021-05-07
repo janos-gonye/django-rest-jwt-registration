@@ -30,7 +30,7 @@ class RegistrationAPIView(APIView):
         serializer = CreateUserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = dict(serializer.validated_data)
-        token, token_db_instance = token_utils.encode_token({}, Token.REGISTRATION_TOKEN)
+        token_db_instance = token_utils.encode_token({}, Token.REGISTRATION_TOKEN)
         user = User.objects.create(is_active=False, **data)
         user.set_password(data['password'])
         user.save()
@@ -43,7 +43,7 @@ class RegistrationAPIView(APIView):
             template_name='drjr_email_registration.html',
             context={
                 'user': user,
-                'confirm_url': self.build_confirm_url(token),
+                'confirm_url': self.build_confirm_url(token_db_instance.token),
             },
         )
         return Response({'detail': _('Confirmation email sent')})
@@ -90,7 +90,7 @@ class RegistrationDeleteAPIView(APIView):
 
     def delete(self, request):
         user = self.get_object()
-        token, __ = token_utils.encode_token({'user_id': user.id}, Token.REGISTRATION_DELETE_TOKEN)
+        token_db_instance = token_utils.encode_token({'user_id': user.id}, Token.REGISTRATION_DELETE_TOKEN)
         send_mail(
             subject=_('Delete account'),
             recipient_list=[user.email],
@@ -98,7 +98,7 @@ class RegistrationDeleteAPIView(APIView):
             template_name='drjr_email_registration_delete.html',
             context={
                 'user': user,
-                'confirm_url': self.build_confirm_url(token),
+                'confirm_url': self.build_confirm_url(token_db_instance.token),
             },
         )
         return Response({'detail': _('Confirmation email sent')})
@@ -147,7 +147,7 @@ class ResetPasswordAPIView(APIView):
             user = User.objects.get(email=serializer.validated_data.get('email'))
         except User.DoesNotExist:
             return Response({'detail': _('Confirmation email sent if a user with given email address exists')})
-        token, __ = token_utils.encode_token({'user_id': user.id}, Token.PASSWORD_CHANGE_TOKEN)
+        token_db_instance = token_utils.encode_token({'user_id': user.id}, Token.PASSWORD_CHANGE_TOKEN)
         send_mail(
             subject=_('Reset password'),
             recipient_list=[user.email],
@@ -155,7 +155,7 @@ class ResetPasswordAPIView(APIView):
             template_name='drjr_email_reset_password.html',
             context={
                 'user': user,
-                'confirm_url': self.build_confirm_url(token),
+                'confirm_url': self.build_confirm_url(token_db_instance.token),
             },
         )
         return Response({'detail': _('Confirmation email sent if a user with given email address exists')})
@@ -238,7 +238,7 @@ class ChangeEmailAPIView(APIView):
         serializer = self.serializer_class(instance=user, data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data.get('email')
-        token, __ = token_utils.encode_token({
+        token_db_instance = token_utils.encode_token({
             'user_id': user.id,
             'email': email,
         }, Token.EMAIL_CHANGE_TOKEN)
@@ -249,7 +249,7 @@ class ChangeEmailAPIView(APIView):
             template_name='drjr_email_change_email.html',
             context={
                 'user': user,
-                'confirm_url': self.build_confirm_url(token),
+                'confirm_url': self.build_confirm_url(token_db_instance.token),
             },
         )
         return Response({'detail': _('Confirmation email sent if given email exists')})

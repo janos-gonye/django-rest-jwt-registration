@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
+from django.db.models.fields import EmailField
 from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
@@ -16,16 +17,15 @@ class CreateUserSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'last_login', 'date_joined')
 
 
-
-class ChangeEmailSerializer(serializers.ModelSerializer):
+class ChangeEmailSerializer(serializers.Serializer):
+    email = serializers.EmailField()
 
     def validate_email(self, value):
         if self.instance.email == value:
             raise serializers.ValidationError(_('Current email provided.'))
-
-    class Meta:
-        model = User
-        fields = ('email', )
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError(_('user with given email address exist.'))
+        return value
 
 
 class ResetPasswordSerializer(serializers.ModelSerializer):

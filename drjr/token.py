@@ -13,8 +13,9 @@ def encode_token(payload, token_type):
     payload = dict(payload)
     token_db_instance = Token.objects.create(type=token_type)
     payload['__id__'] = str(token_db_instance.id)
-    return jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256'), token_db_instance
-
+    token_db_instance.token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+    token_db_instance.save()
+    return token_db_instance
 
 def decode_token(token, token_type):
     try:
