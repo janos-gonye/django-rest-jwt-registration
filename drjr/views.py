@@ -10,13 +10,13 @@ from rest_framework.views import APIView
 
 from drjr import serializers
 from drjr import token as token_utils
-from drjr.apps import app_settings
+from drjr.apps import DjangoRestJwtRegistrationConfig
 from drjr.decorators import handle_token_decode_error
 from drjr.models import Token
 from drjr.utils import send_mail
 
 User = get_user_model()
-CreateUserSerializer = app_settings['CREATE_USER_SERIALIZER']
+CreateUserSerializer = DjangoRestJwtRegistrationConfig.settings['CREATE_USER_SERIALIZER']
 
 
 class RegistrationAPIView(APIView):

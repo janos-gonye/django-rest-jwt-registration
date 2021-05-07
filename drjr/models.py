@@ -30,7 +30,8 @@ class Token(models.Model):
 
     @property
     def lifetime(self):
-        from drjr.apps import app_settings
+        from drjr.apps import DjangoRestJwtRegistrationConfig
+        app_settings = DjangoRestJwtRegistrationConfig.settings
         return {
             Token.REGISTRATION_TOKEN: app_settings['REGISTRATION_TOKEN_LIFETIME'],
             Token.REGISTRATION_DELETE_TOKEN: app_settings['REGISTRATION_DELETE_TOKEN_LIFETIME'],

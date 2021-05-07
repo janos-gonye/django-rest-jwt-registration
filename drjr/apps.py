@@ -6,9 +6,6 @@ from rest_framework import serializers
 from drjr.utils import import_elm_from_str
 
 
-app_settings = None
-
-
 class AppSettingsSerializer(serializers.Serializer):
     CREATE_USER_SERIALIZER = serializers.CharField(required=False, default='drjr.serializers.CreateUserSerializer')
     REGISTRATION_TOKEN_LIFETIME = serializers.IntegerField(required=False, min_value=1, default=3600)
@@ -25,11 +22,11 @@ class AppSettingsSerializer(serializers.Serializer):
             return user_serializer
         except Exception as err:
             raise serializers.ValidationError("refers to an object that does not exist") from err
-        return value
 
 
 class DjangoRestJwtRegistrationConfig(AppConfig):
     name = 'drjr'
+    settings = {}
 
     def ready(self):
         try:
@@ -43,5 +40,4 @@ class DjangoRestJwtRegistrationConfig(AppConfig):
             raise ImproperlyConfigured("'DJANGO_REST_JWT_REGISTRATION' is not set") from err
         except serializers.ValidationError as err:
             raise ImproperlyConfigured(str(err)) from err
-        global app_settings
-        app_settings = dict(serializer.validated_data)
+        DjangoRestJwtRegistrationConfig.settings = dict(serializer.validated_data)
