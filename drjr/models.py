@@ -29,6 +29,7 @@ class Token(models.Model):
         (EMAIL_CHANGE_TOKEN, _('Change Email Token')),
     )
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+    token = models.TextField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     type = models.CharField(choices=TOKEN_TYPES, max_length=3, default=REGISTRATION_TOKEN)
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, default=None)
