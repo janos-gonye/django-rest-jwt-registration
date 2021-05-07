@@ -20,9 +20,7 @@ class AppSettingsSerializer(serializers.Serializer):
             if not issubclass(user_serializer, serializers.ModelSerializer):
                 raise serializers.ValidationError(f"expected to be a subclass of {serializers.ModelSerializer}")
         except Exception as err:
-            raise serializers.ValidationError(
-                "'CREATE_USER_SERIALIZER' refers "
-                "to an object that does not exist") from err
+            raise serializers.ValidationError("refers to an object that does not exist") from err
         return value
 
 
