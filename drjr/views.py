@@ -17,7 +17,7 @@ from drjr.utils import import_elm_from_str, send_mail
 
 User = get_user_model()
 try:
-    CREATE_USER_SERIALIZER_PATH = settings.REST_JWT_REGISTRATION['CREATE_USER_SERIALIZER']
+    CREATE_USER_SERIALIZER_PATH = settings.DJANGO_REST_JWT_REGISTRATION['CREATE_USER_SERIALIZER']
 except KeyError:
     CREATE_USER_SERIALIZER_PATH = 'drjr.serializers.CreateUserSerializer'
 CreateUserSerializer = import_elm_from_str(CREATE_USER_SERIALIZER_PATH)
