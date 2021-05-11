@@ -4,4 +4,4 @@ djangorestframework
 psycopg2-binary
 python-dotenv
 pyjwt
-drjr @ git+https://github.com/janos-gonye/django-rest-jwt-registration.git@main
+django-rest-jwt-registration @ git+https://github.com/janos-gonye/django-rest-jwt-registration.git@main
