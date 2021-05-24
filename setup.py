@@ -13,7 +13,11 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url='https://github.com/janos-gonye/django-rest-jwt-registration',
     license='MIT',
-    packages=['drjr'],
+    packages=[
+        'drjr',
+        'drjr.migrations',
+        'drjr.templates',
+    ],
     classifiers=[
         'Development Status :: 3 - Alfa',
         'Environment :: Web Environment',
