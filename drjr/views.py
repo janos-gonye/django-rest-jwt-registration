@@ -21,9 +21,10 @@ CreateUserSerializer = DjangoRestJwtRegistrationConfig.settings['CREATE_USER_SER
 
 class RegistrationAPIView(APIView):
     permission_classes = ()
+    serializer_class = CreateUserSerializer
 
     def post(self, request):
-        serializer = CreateUserSerializer(data=request.data)
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = dict(serializer.validated_data)
         token_db_instance = token_utils.encode_token({}, Token.REGISTRATION_TOKEN)
