@@ -28,6 +28,9 @@ class Token(models.Model):
     type = models.CharField(choices=TOKEN_TYPES, max_length=3, default=REGISTRATION_TOKEN)
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, default=None)
 
+    def __str__(self):
+        return self.token
+
     @property
     def lifetime(self):
         from drjr.apps import DjangoRestJwtRegistrationConfig
