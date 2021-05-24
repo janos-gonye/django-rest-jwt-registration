@@ -6,6 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setuptools.setup(
     name='django-rest-jwt-registration',
     author='János Gönye',
+    author_email='janos.gonye@gmail.com',
     version='0.1.0',
     description='Django app for registration password reset, email - and password change with jwt tokens and email sending',
     long_description=long_description,
