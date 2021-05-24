@@ -1,10 +1,15 @@
-from setuptools import setup
+import setuptools
 
-setup(
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
+
+setuptools.setup(
     name='django-rest-jwt-registration',
+    author='János Gönye',
     version='0.1.0',
     description='Django app for registration password reset, email - and password change with jwt tokens and email sending',
-    long_description='file:README.md',
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     url='https://github.com/janos-gonye/django-rest-jwt-registration',
     license='MIT',
     packages=['drjr'],
@@ -20,6 +25,7 @@ setup(
         'Topic :: Software Development :: Libraries :: Application Frameworks',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
+    python_requires=">=3.6",
     setup_requires = [
         'setuptools >= 38.3.0',
     ],
