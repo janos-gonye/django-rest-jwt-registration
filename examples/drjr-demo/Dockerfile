@@ -22,6 +22,7 @@ RUN set -x && \
     pip3 install --upgrade pip setuptools wheel
 WORKDIR /www
 COPY requirements.txt .
+RUN pip3 install --upgrade pip
 RUN pip3 install --ignore-installed -r requirements.txt
 
 COPY . ./
