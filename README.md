@@ -53,7 +53,7 @@ Add configs to `settings.py`.
 ```py
 # Expiration time in seconds
 DJANGO_REST_JWT_REGISTRATION = {
-    # Optional
+    # Optional - in form of `app_name.module_name.class_name`
     'CREATE_USER_SERIALIZER': 'core.serializers.CreateUserSerializer',
     # Optional
     'REGISTRATION_TOKEN_LIFETIME': int(os.getenv('REGISTRATION_TOKEN_LIFETIME', '3600')),
