@@ -31,9 +31,7 @@ Then, you need to add `drjr` to `INSTALLED_APPS`.
 ```py
 INSTALLED_APPS = [
     '...,'
-
-    'rest_registration',
-
+    'drjr',
     '...,'
 ]
 ```
