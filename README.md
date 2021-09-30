@@ -122,3 +122,81 @@ class CreateUserSerializer(serializers.ModelSerializer):
         fields = ('id', 'username', 'email', 'password')
         read_only_fields = ('id', 'last_login', 'date_joined')
 ```
+
+> Warning!<br>
+Be careful and do not allow `is_staff` or` is_superuser` fields to be writable.
+By allowing them to be writable, you would create a serious vulnerability,
+and clever but malicious users could take control over your site in the worst case.
+
+## Customizing Default Email Templates
+
+The default templates are very bare with no styling or whatsoever.
+But no worries, you can override any or all of the templates as you please.
+
+These are the existing template files:
+
+- `drjr_email_change_confirm.html`
+- `drjr_email_change_email_confirm.html`
+- `drjr_email_change_email.html`
+- `drjr_email_change_password.html`
+- `drjr_email_registration_confirm.html`
+- `drjr_email_registration_delete_confirm.html`
+- `drjr_email_registration_delete.html`
+- `drjr_email_registration.html`
+- `drjr_email_reset_password_confirm.html`
+- `drjr_email_reset_password.html`
+- `drjr_registration_confirm.html`
+- `drjr_registration_delete_confirm.html`
+- `drjr_reset_password_confirm.html`
+
+Or you may be better off creating a folder named `drjr` inside your
+`templates` directory to keep files organized.
+
+```
+mkdir ./templates/drjr
+```
+
+And add it to the template directories in `settings.py`.
+
+```py
+import os.path
+
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            'templates',
+            os.path.join('templates', 'drjr'),
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+```
+
+> Note<br>
+The actual `User` model instance created, deleted, or modified as a context variable is available in every template named as `user`.
+
+E.g., in `drjr_email_reset_password_confirm.html`.
+
+```html
+<h3>Default Template Overridden</h3>
+<p>
+Dear <strong>{{ user.username }}</strong>,<br>
+<br>
+Your email address has been changed as requested.<br>
+<br>
+
+Sincerely Yours,<br>
+Your developer
+</em>
+</p>
+```
