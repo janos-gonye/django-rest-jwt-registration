@@ -9,3 +9,12 @@ and `djangorestframework-simplejwt`.
 - Django (2.0+, 3.0+) and Django-REST-Framework (3.3+)
 - PyJWT (tested on 2.0+)
 
+## Features
+- registration (sign-up)
+- change password
+- change email
+- reset (forgotton) password (new password sent in email)
+- delete registration
+
+All with automatic confirmation email.
+
