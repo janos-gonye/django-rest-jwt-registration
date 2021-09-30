@@ -77,7 +77,7 @@ EMAIL_USE_TLS = bool(int(os.getenv('EMAIL_USE_TLS')))
 EMAIL_USE_SSL = bool(int(os.getenv('EMAIL_USE_SSL')))
 ```
 
-> Note
+> Note<br>
 `DELETE_EXPIRED_TOKEN_INTERVAL` specifies the frequency to delete expired
 tokens and the corresponding users that have not yet been activated
 (User.is_active == False). Note, not all inactive users get deleted, but only
@@ -121,7 +121,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'last_login', 'date_joined')
 ```
 
-> Warning!<br>
+> `Warning!`<br>
 Be careful and do not allow `is_staff` or` is_superuser` fields to be writable.
 By allowing them to be writable, you would create a serious vulnerability,
 and clever but malicious users could take control over your site in the worst case.
