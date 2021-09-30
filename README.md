@@ -200,3 +200,25 @@ Your developer
 </em>
 </p>
 ```
+
+## Cherry-picking Views
+
+If you only need some of the provided views, you can easily pick the ones you need.
+
+E.g., in your root `urls.py`.
+
+```py
+from django.contrib import admin
+from django.urls import include, path
+
+
+from drjr import views import ResetPasswordAPIView, ResetPasswordConfirmView
+
+
+urlpatterns = [
+    '...',
+    path('reset-password', views.ResetPasswordAPIView.as_view()),
+    path('reset-password/confirm', views.ResetPasswordConfirmView.as_view()),
+    '...',
+]
+```
