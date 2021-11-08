@@ -83,7 +83,7 @@ class RegistrationDeleteAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def get_object(self):
-        return User.objects.get(pk=self.request.user.id)
+        return User.objects.get(pk=self.request.user.id, is_active=True)
 
     def delete(self, request):
         user = self.get_object()
@@ -117,7 +117,7 @@ class RegistrationConfirmDeleteView(View):
         if not token:
             return HttpResponseBadRequest(_('Token missing'))
         payload, __ = token_utils.decode_token(token, Token.REGISTRATION_DELETE_TOKEN)
-        user = User.objects.get(pk=payload['user_id'])
+        user = User.objects.get(pk=payload['user_id'], is_active=True)
         user.delete()
         send_mail(
             subject=_('Account deleted'),
@@ -141,7 +141,7 @@ class ResetPasswordAPIView(APIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         try:
-            user = User.objects.get(email=serializer.validated_data.get('email'))
+            user = User.objects.get(email=serializer.validated_data.get('email'), is_active=True)
         except User.DoesNotExist:
             return Response({'detail': _('Confirmation email sent if a user with given email address exists')})
         token_db_instance = token_utils.encode_token({'user_id': user.id}, Token.PASSWORD_CHANGE_TOKEN)
@@ -174,7 +174,7 @@ class ResetPasswordConfirmView(View):
         if not token:
             return HttpResponseBadRequest(_('Token missing'))
         payload, __ = token_utils.decode_token(token, Token.PASSWORD_CHANGE_TOKEN)
-        user = User.objects.get(pk=payload['user_id'])
+        user = User.objects.get(pk=payload['user_id'], is_active=True)
         new_password = User.objects.make_random_password()
         user.set_password(new_password)
         user.save()
@@ -274,7 +274,7 @@ class ChangeEmailConfirmView(View):
         if not token:
             return HttpResponseBadRequest(_('Token missing'))
         payload, __ = token_utils.decode_token(token, Token.EMAIL_CHANGE_TOKEN)
-        user = User.objects.get(pk=payload['user_id'])
+        user = User.objects.get(pk=payload['user_id'], is_active=True)
         new_email = payload['email']
         user.email = new_email
         user.save()
